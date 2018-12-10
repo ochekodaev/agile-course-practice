@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':frac-calc-ViewModel')
+    testCompile project(':frac-calc-ViewModel').sourceSets.test.output
+}

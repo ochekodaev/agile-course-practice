@@ -30,8 +30,17 @@ public class ViewModel {
     private final StringProperty status = new SimpleStringProperty();
     private final List<InputValueChanger> valueChangedListeners = new ArrayList<>();
 
+    private final StringProperty log = new SimpleStringProperty();
+
+    private ILogger logger;
+
     public ViewModel() {
         initDefaultFields();
+    }
+
+    public ViewModel(final ILogger logger) {
+        initDefaultFields();
+        setLogger(logger);
     }
 
     private void initDefaultFields() {
@@ -43,6 +52,7 @@ public class ViewModel {
         resultNumerator.set("");
         resultDenominator.set("");
         status.set(Status.WAITING.toString());
+        log.set("");
 
         BooleanBinding couldCalculate = new BooleanBinding() {
             {
@@ -71,6 +81,10 @@ public class ViewModel {
             field.addListener(listener);
             valueChangedListeners.add(listener);
         }
+
+        final InputValueChanger listener = new InputValueChanger();
+        operation.addListener(listener);
+        valueChangedListeners.add(listener);
     }
 
     public StringProperty firstNumeratorProperty() {
@@ -121,12 +135,36 @@ public class ViewModel {
         return status.get();
     }
 
-    private class InputValueChanger implements ChangeListener<String> {
+    public StringProperty logProperty() {
+        return log;
+    }
+
+    public final String getLog() {
+        return log.get();
+    }
+
+    public List<String> getLogList() {
+        return logger.getLog();
+    }
+
+    public final void setLogger(final ILogger logger) {
+        if (logger == null) {
+            throw new IllegalArgumentException("Logger can't be null");
+        }
+        this.logger = logger;
+    }
+
+    private class InputValueChanger implements ChangeListener<Object> {
         @Override
-        public void changed(final ObservableValue<? extends String> obs,
-                            final String prevVal,
-                            final String nextVal) {
+        public void changed(final ObservableValue<?> obs,
+                            final Object prevVal,
+                            final Object nextVal) {
             status.set(getInputStatus().toString());
+            if (obs == operation) {
+                writeToLog(operationStateLogMessage());
+            } else {
+                writeToLog(fractionsStateLogMessage());
+            }
         }
     }
 
@@ -161,6 +199,51 @@ public class ViewModel {
         return inputStatus;
     }
 
+    private void writeToLog(final String message) {
+        logger.log(message);
+        StringBuilder logMessages = new StringBuilder();
+        for (String line : getLogList()) {
+            logMessages.append(line).append("\n");
+        }
+        log.set(logMessages.toString());
+    }
+
+    private String currentStateForAllFieldsLogMessage() {
+        Operation currentOperation = operation.get();
+        return String.format(LogMessages.CURRENT_STATE,
+                firstNumerator.get(),
+                firstDenominator.get(),
+                secondNumerator.get(),
+                secondDenominator.get(),
+                resultNumerator.get(),
+                resultDenominator.get(),
+                currentOperation.toString(),
+                status.get(),
+                calculationDisabled.get(),
+                getOperations().toString());
+    }
+
+    private String fractionsStateLogMessage() {
+        return String.format(LogMessages.FRACTIONS_WERE_CHANGED,
+                firstNumerator.get(),
+                firstDenominator.get(),
+                secondNumerator.get(),
+                secondDenominator.get(),
+                status.get(),
+                calculationDisabled.get());
+    }
+
+    private String operationStateLogMessage() {
+        Operation currentOperation = operation.get();
+        return String.format(LogMessages.OPERATION_WAS_CHANGED,
+                currentOperation.toString());
+    }
+
+    private String stateAfterCalculateLogMessage() {
+        return LogMessages.CALCULATE_BUTTON_WAS_PRESSED + " "
+                + currentStateForAllFieldsLogMessage();
+    }
+
     public void calculate() {
         if (calculationDisabled.get()) {
             return;
@@ -175,8 +258,33 @@ public class ViewModel {
         resultNumerator.set(String.valueOf(res.getNumerator()));
         resultDenominator.set(String.valueOf(res.getDenominator()));
         status.set(Status.SUCCESS.toString());
+
+        writeToLog(stateAfterCalculateLogMessage());
     }
-}
+
+    public static final class LogMessages {
+        public static final String CURRENT_STATE =
+                "Current state: "
+                        + "First fraction (%s/%s), "
+                        + "Second fraction (%s/%s), "
+                        + "Result fraction (%s/%s), "
+                        + "Operation (%s), "
+                        + "Status (%s), "
+                        + "Calculate disabled (%s), "
+                        + "All operations (%s).";
+        public static final String FRACTIONS_WERE_CHANGED =
+                "Fractions were changed: "
+                        + "First fraction (%s/%s), "
+                        + "Second fraction (%s/%s), "
+                        + "Status (%s), "
+                        + "Calculate disabled (%s).";
+        public static final String OPERATION_WAS_CHANGED =
+                "Operation was changed: "
+                        + "Operation (%s).";
+        public static final String CALCULATE_BUTTON_WAS_PRESSED =
+                "Calculate button was pressed.";
+    }
+    }
 
 enum Status {
     WAITING("Please provide input data"),

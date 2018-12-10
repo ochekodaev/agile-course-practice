@@ -2,4 +2,5 @@ apply from: rootDir.getAbsolutePath() + '/config/scripts/javafx.plugin'
 
 dependencies {
     compile project(':frac-calc-ViewModel')
+    compile project(':frac-calc-Infrastructure')
 }

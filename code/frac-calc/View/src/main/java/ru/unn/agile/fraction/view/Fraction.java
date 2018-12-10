@@ -9,6 +9,7 @@ import javafx.scene.control.ComboBox;
 
 import ru.unn.agile.fraction.model.Fraction.Operation;
 import ru.unn.agile.fraction.viewmodel.ViewModel;
+import ru.unn.agile.fraction.infrastructure.TxtLogger;
 
 public class Fraction {
     @FXML
@@ -33,6 +34,8 @@ public class Fraction {
 
     @FXML
     void initialize() {
+        viewModel.setLogger(new TxtLogger("./FractionCalculator.log"));
+
         firstNumerator.textProperty().bindBidirectional(viewModel.firstNumeratorProperty());
         firstDenominator.textProperty().bindBidirectional(viewModel.firstDenominatorProperty());
         secondNumerator.textProperty().bindBidirectional(viewModel.secondNumeratorProperty());

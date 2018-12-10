@@ -241,6 +241,8 @@ include "code/frac-calc/ViewModel"
 project(":code/frac-calc/ViewModel").name = "frac-calc-ViewModel"
 include "code/frac-calc/View"
 project(":code/frac-calc/View").name = "frac-calc-View"
+include "code/frac-calc/Infrastructure"
+project(":code/frac-calc/Infrastructure").name = "frac-calc-Infrastructure"
 
 // 3D shapes volume
 include "code/shape-volume-calculator/Model"

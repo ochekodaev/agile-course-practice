@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
@@ -9,8 +7,8 @@
 <?import ru.unn.agile.fraction.viewmodel.ViewModel?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="286.0000999999975" prefWidth="500.0" xmlns:fx="http://javafx.com/fxml/1"
-            xmlns="http://javafx.com/javafx/2.2" fx:controller="ru.unn.agile.fraction.view.Fraction">
+            prefHeight="286.0" prefWidth="673.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.unn.agile.fraction.view.Fraction">
   <fx:define>
     <ViewModel fx:id="viewModel"/>
   </fx:define>
@@ -28,5 +26,14 @@
     <Line endX="-21.0" endY="0.0" layoutX="473.0" layoutY="145.0" startX="-81.0" startY="0.0" />
     <ComboBox fx:id="cbOperation" items="${viewModel.operations}" layoutX="132.0" layoutY="129.0" minWidth="63.0" prefWidth="97.0"/>
     <Label layoutX="40.0" layoutY="224.0" text="${viewModel.status}" />
+      <ScrollPane layoutX="465.0" layoutY="46.0" prefHeight="200.0" prefWidth="200.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TextArea prefHeight="200.0" prefWidth="200.0" text="${viewModel.log}" wrapText="true"/>
+               </children>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
   </children>
 </AnchorPane>
